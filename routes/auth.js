@@ -4,13 +4,14 @@ const jwt = require("jsonwebtoken");
 const { User, userValidationSchema, validateLogin } = require("../models/User");
 
 const validateMiddleware = require("../middlewares/validate");
+const authProtect = require("../middlewares/auth");
 
 authRouter.post(
   "/register",
   [validateMiddleware(userValidationSchema)],
   async (req, res) => {
     try {
-      const { email, password, name } = req.body;
+      const { email, password, fName, lName } = req.body;
 
       // check if user already exists
       const doesUserAlreadyExists = await User.findOne({ email });
@@ -23,7 +24,8 @@ authRouter.post(
 
       // create new user
       const newUser = new User({
-        name,
+        fName,
+        lName,
         email,
         password: hashedPassword,
       });
@@ -78,12 +80,24 @@ authRouter.post(
       );
 
       // send back response
-      return res.status(200).send({ token });
+      return res.status(200).send({
+        token,
+        user: {
+          id: doesUserExists._id,
+          email: doesUserExists.email,
+          fName: doesUserExists.fName,
+          lName: doesUserExists.lName,
+        },
+      });
     } catch (error) {
       console.log(error);
       return res.status(500).json({ message: "Something went wrong!" });
     }
   }
 );
+
+authRouter.get("/protected", authProtect, (req, res) => {
+  return res.status(200).send("You are authorized!");
+});
 
 module.exports = authRouter;

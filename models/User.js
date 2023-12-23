@@ -2,7 +2,11 @@ const mongoose = require("mongoose");
 const Joi = require("joi");
 
 const UserSchema = new mongoose.Schema({
-  name: {
+  fName: {
+    type: String,
+    required: true,
+  },
+  lName: {
     type: String,
     required: true,
   },
@@ -19,7 +23,8 @@ const UserSchema = new mongoose.Schema({
 // validate user data
 const userValidationSchema = (user) => {
   const schema = Joi.object({
-    name: Joi.string().required("Name is required"),
+    fName: Joi.string().required("First name is required"),
+    lName: Joi.string().required("Last name is required"),
     email: Joi.string().email().required("Email is required"),
     password: Joi.string().required("Password is required"),
   });

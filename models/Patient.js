@@ -12,15 +12,10 @@ const patientSchema = new mongoose.Schema({
   },
   gender: {
     type: String,
-    enum: ["Male", "Female", "Other"],
     required: true,
   },
   contactNumber: {
     type: String,
-    required: true,
-  },
-  appointmentDate: {
-    type: Date,
     required: true,
   },
   createdAt: {
@@ -30,14 +25,15 @@ const patientSchema = new mongoose.Schema({
 });
 
 // validate patient data
-exports.patientValidationSchema = Joi.object({
-  name: Joi.string().required("Name is required"),
-  age: Joi.number().required("Age is required"),
-  gender: Joi.string().valid("Male", "Female", "Other").required(),
-  contactNumber: Joi.string().required("Contact number is required"),
-  appointmentDate: Joi.date().required("Appointment date is required"),
-});
+exports.patientValidationSchema = (patient) => {
+  const schema = Joi.object({
+    name: Joi.string().required("Name is required"),
+    age: Joi.number().required("Age is required"),
+    contactNumber: Joi.string().required("Contact number is required"),
+  });
+  return schema.validate(patient);
+};
 
 const Patient = mongoose.model("Patient", patientSchema);
 
-module.exports = Patient;
+module.exports = { Patient, patientValidationSchema };
